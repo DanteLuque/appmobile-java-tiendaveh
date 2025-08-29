@@ -27,7 +27,7 @@ public class Listar extends AppCompatActivity {
 
     ListView lstVehiculos;
     private final String URL_DEV = "http://192.168.101.37:3001/api/v1/vehiculos";
-    private final String URL_PROD = "http://192.168.101.37:3000/api/v1/vehiculos";
+    private final String URL_PROD = "https://crisp-mainly-mastodon.ngrok-free.app/api/v1/vehiculos";
     RequestQueue requestQueue;
 
     @Override
