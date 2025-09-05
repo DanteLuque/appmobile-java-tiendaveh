@@ -4,30 +4,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class Listar extends AppCompatActivity {
 
     ListView lstVehiculos;
-    private final String URL_DEV = "http://192.168.56.1:3001/api/v1/vehiculos";
-    private final String URL_DOCKER = "https://walrus-delicate-routinely.ngrok-free.app/api/v1/vehiculos";
+    private final String URL_VEHICULOS = Config.getVehiculosEndpoint();
     RequestQueue requestQueue;
 
     @Override
@@ -49,7 +40,7 @@ public class Listar extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
-                URL_DOCKER,
+                URL_VEHICULOS,
                 null,
                 new Response.Listener<JSONArray>() {
                     @Override

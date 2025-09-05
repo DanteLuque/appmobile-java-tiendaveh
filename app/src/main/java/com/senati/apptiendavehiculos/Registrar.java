@@ -1,8 +1,8 @@
 package com.senati.apptiendavehiculos;
 
 import static com.senati.apptiendavehiculos.utils.FieldsUtils.isEmpty;
-import static com.senati.apptiendavehiculos.utils.ToastUtils.showToastShort;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,16 +11,15 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.senati.apptiendavehiculos.utils.ToastUtils;
+
 import org.json.JSONObject;
 
 public class Registrar extends AppCompatActivity {
 
-    private final String URL_DEV = "http://192.168.101.37:3001/api/v1/vehiculos";
-    private final String URL_DOCKER = "https://walrus-delicate-routinely.ngrok-free.app/api/v1/vehiculos";
+    private final String URL_VEHICULOS = Config.getVehiculosEndpoint();
     RequestQueue requestQueue;
 
     EditText edtMarca, edtModelo, edtColor, edtPrecio, edtPlaca;
@@ -59,27 +58,28 @@ public class Registrar extends AppCompatActivity {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                URL_DOCKER,
+                URL_VEHICULOS,
                 jsonObject,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        try{
-                            String id = jsonObject.getString("id");
-                            Log.d("Registro exitoso: ", id);
-                        }catch (Exception e){
-                            Log.e("Error en JSON: ", e.toString());
+                response -> {
+                    ToastUtils.showToastShort(this, "Vehículo registrado correctamente 🚗");
+                    clearFields();
+                    startActivity(new Intent(this, Listar.class));
+                },
+                error -> {
+                    String errorMessage = "Ocurrió un error al registrar";
+
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        try {
+                            String body = new String(error.networkResponse.data, "UTF-8");
+                            JSONObject jsonError = new JSONObject(body);
+                            if (jsonError.has("error")) errorMessage = jsonError.getString("error");
+                        } catch (Exception e) {
+                            Log.e("Registrar", "Error parseando respuesta: " + e.getMessage());
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Log.e("Error en WS: ", volleyError.toString());
-                    }
+                    ToastUtils.showToastShort(this, "❌ " + errorMessage);
                 }
         );
-
         requestQueue.add(jsonObjectRequest);
     }
 
