@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -97,6 +99,12 @@ public class Registrar extends AppCompatActivity {
                 error -> handleVolleyError(error, "registrar")
         );
 
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                30000, // 30s
+                2,     // reintentos
+                1.0f
+        ));
+
         requestQueue.add(req);
     }
 
@@ -113,6 +121,13 @@ public class Registrar extends AppCompatActivity {
                 },
                 error -> handleVolleyError(error, "actualizar")
         );
+
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                30000, // 30s
+                2,     // reintentos
+                1.0f
+        ));
+
         requestQueue.add(req);
     }
 

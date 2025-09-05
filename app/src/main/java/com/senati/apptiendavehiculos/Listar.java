@@ -13,10 +13,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.senati.apptiendavehiculos.config.Config;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import androidx.appcompat.app.AlertDialog;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.DefaultRetryPolicy;
 
 public class Listar extends AppCompatActivity {
 
@@ -86,6 +88,12 @@ public class Listar extends AppCompatActivity {
             ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStrings);
             lstVehiculos.setAdapter(adapter);
 
+            lstVehiculos.setOnItemLongClickListener((parent, view, position, id1) -> {
+                Vehiculo selected = dataVehiculos.get(position);
+                showDeleteDialog(selected);
+                return true; // consumimos el evento
+            });
+
             lstVehiculos.setOnItemClickListener((parent, view, position, id) -> {
                 Vehiculo selected = dataVehiculos.get(position);
                 Intent iEdit = new Intent(Listar.this, Registrar.class);
@@ -97,5 +105,41 @@ public class Listar extends AppCompatActivity {
         }catch (Exception error){
             Log.e("Render", error.toString());
         }
+    }
+
+    private void showDeleteDialog(Vehiculo v) {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar vehículo")
+                .setMessage("¿Seguro que deseas eliminar: " + v.marca + " " + v.modelo + " (" + v.placa + ")?")
+                .setPositiveButton("Eliminar", (dialog, which) -> doDelete(v.id))
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void doDelete(int idVehiculo) {
+        if (requestQueue == null) requestQueue = Volley.newRequestQueue(this);
+        String url = Config.getVehiculoEndpointById(idVehiculo);
+        StringRequest req = new StringRequest(
+                Request.Method.DELETE,
+                url,
+                response -> {
+                    Log.d("Eliminar", "OK: " + response);
+                    getData();
+                },
+                error -> {
+                    String msg = "Error al eliminar";
+                    if (error.networkResponse != null) {
+                        msg += " (HTTP " + error.networkResponse.statusCode + ")";
+                    }
+                    Log.e("Eliminar", msg + " -> " + error);
+                }
+        );
+
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                30000, // 30s
+                2,     // reintentos
+                1.0f
+        ));
+        requestQueue.add(req);
     }
 }
