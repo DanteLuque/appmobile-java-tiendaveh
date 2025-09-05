@@ -1,30 +1,26 @@
 package com.senati.apptiendavehiculos;
 
+import static com.senati.apptiendavehiculos.utils.FieldsUtils.isEmpty;
+import static com.senati.apptiendavehiculos.utils.ToastUtils.showToastShort;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONObject;
 
 public class Registrar extends AppCompatActivity {
 
     private final String URL_DEV = "http://192.168.101.37:3001/api/v1/vehiculos";
-    private final String URL_PROD = "https://crisp-mainly-mastodon.ngrok-free.app/api/v1/vehiculos";
+    private final String URL_DOCKER = "https://walrus-delicate-routinely.ngrok-free.app/api/v1/vehiculos";
     RequestQueue requestQueue;
 
     EditText edtMarca, edtModelo, edtColor, edtPrecio, edtPlaca;
@@ -46,11 +42,11 @@ public class Registrar extends AppCompatActivity {
         btnGuardar = findViewById(R.id.btnGuardar);
     }
 
-    private void sendDataWS(View view){
+    public void sendDataWS(View view){
+        if(!validateFields()) return;
+
         requestQueue = Volley.newRequestQueue(this);
-
         JSONObject jsonObject = new JSONObject();
-
         try {
             jsonObject.put("marca", edtMarca.getText().toString());
             jsonObject.put("modelo", edtModelo.getText().toString());
@@ -63,13 +59,14 @@ public class Registrar extends AppCompatActivity {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                URL_DEV,
+                URL_DOCKER,
                 jsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
                         try{
                             String id = jsonObject.getString("id");
+                            Log.d("Registro exitoso: ", id);
                         }catch (Exception e){
                             Log.e("Error en JSON: ", e.toString());
                         }
@@ -84,5 +81,23 @@ public class Registrar extends AppCompatActivity {
         );
 
         requestQueue.add(jsonObjectRequest);
+    }
+
+    private boolean validateFields() {
+        if (isEmpty(edtMarca)) return false;
+        if (isEmpty(edtModelo)) return false;
+        if (isEmpty(edtColor)) return false;
+        if (isEmpty(edtPrecio)) return false;
+        if (isEmpty(edtPlaca)) return false;
+
+        return true;
+    }
+
+    private void clearFields() {
+        edtMarca.setText("");
+        edtModelo.setText("");
+        edtColor.setText("");
+        edtPrecio.setText("");
+        edtPlaca.setText("");
     }
 }

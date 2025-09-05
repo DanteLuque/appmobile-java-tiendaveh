@@ -38,10 +38,11 @@
         android:maxLength="7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-    
+
     <Button
         android:id="@+id/btnGuardar"
-        android:text="Guardar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:onClick="sendDataWS"
+        android:text="Guardar" />
 </LinearLayout>
