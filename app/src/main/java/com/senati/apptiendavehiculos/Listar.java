@@ -1,5 +1,6 @@
 package com.senati.apptiendavehiculos;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -11,6 +12,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.senati.apptiendavehiculos.config.Config;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 public class Listar extends AppCompatActivity {
 
     ListView lstVehiculos;
+    private ArrayList<Vehiculo> dataVehiculos = new ArrayList<>();
     private final String URL_VEHICULOS = Config.getVehiculosEndpoint();
     RequestQueue requestQueue;
 
@@ -62,21 +66,36 @@ public class Listar extends AppCompatActivity {
 
     private void renderData(JSONArray jsonArray){
         try{
-            ArrayAdapter adapter;
-            ArrayList<String> listaVehiculos = new ArrayList<>();
+            ArrayList<String> listaStrings = new ArrayList<>();
+            dataVehiculos.clear();
 
             for(int i=0; i<jsonArray.length(); i++){
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                listaVehiculos.add(
-                                jsonObject.getString("marca")+" "+
-                                jsonObject.getString("modelo")
-                );
+                JSONObject o = jsonArray.getJSONObject(i);
+                Vehiculo v = new Vehiculo();
+                v.id = o.getInt("id");
+                v.marca = o.getString("marca");
+                v.modelo = o.getString("modelo");
+                v.color = o.getString("color");
+                v.precio = o.getDouble("precio");
+                v.placa = o.getString("placa");
+
+                dataVehiculos.add(v);
+                listaStrings.add(v.marca + " " + v.modelo + " (" + v.placa + ")");
             }
 
-            adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaVehiculos);
+            ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStrings);
             lstVehiculos.setAdapter(adapter);
+
+            lstVehiculos.setOnItemClickListener((parent, view, position, id) -> {
+                Vehiculo selected = dataVehiculos.get(position);
+                Intent iEdit = new Intent(Listar.this, Registrar.class);
+                iEdit.putExtra("isEdit", true);
+                iEdit.putExtra("vehiculo", selected); // Serializable
+                startActivity(iEdit);
+            });
+
         }catch (Exception error){
-            Log.e("Error en el renderizado de los datos: ", error.toString());
+            Log.e("Render", error.toString());
         }
     }
 }

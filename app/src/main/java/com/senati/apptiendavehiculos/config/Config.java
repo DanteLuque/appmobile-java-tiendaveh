@@ -1,4 +1,4 @@
-package com.senati.apptiendavehiculos;
+package com.senati.apptiendavehiculos.config;
 
 /**
  *  la clase Config centraliza la URL del servicio backend
@@ -16,5 +16,9 @@ public class Config {
 
     public static String getVehiculosEndpoint() {
         return getBaseUrl() + "/vehiculos";
+    }
+
+    public static String getVehiculoEndpointById(int id) {
+        return getVehiculosEndpoint() + "/" + id;
     }
 }
