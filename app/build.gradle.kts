@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.senati.apptiendavehiculos"
-        minSdk = 31
+        minSdk = 29
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"

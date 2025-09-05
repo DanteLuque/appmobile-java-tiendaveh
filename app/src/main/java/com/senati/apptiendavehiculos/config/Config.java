@@ -7,7 +7,8 @@ package com.senati.apptiendavehiculos.config;
  */
 public class Config {
     private static final String URL_DEV = "http://192.168.56.1:3001/api/v1";
-    private static final String URL_PROD = "https://walrus-delicate-routinely.ngrok-free.app/api/v1";
+    //private static final String URL_PROD = "https://walrus-delicate-routinely.ngrok-free.app/api/v1";
+    private static final String URL_PROD = "https://crud-node-tiendaveh.onrender.com/api/v1";
     private static final boolean USE_PROD = true;
 
     public static String getBaseUrl() {
